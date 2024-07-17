@@ -8,13 +8,16 @@ import com.zhl.registry.ServiceDiscovery;
 import com.zhl.remoting.dto.RpcRequest;
 import com.zhl.remoting.dto.RpcResponse;
 import com.zhl.remoting.transport.RpcRequestTransport;
+import com.zhl.remoting.transport.netty.client.NettyRpcClient;
 import com.zhl.remoting.transport.socket.SocketRpcClient;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * <p>
@@ -50,6 +53,7 @@ public class RpcClientProxy implements InvocationHandler {
     }
 
 
+    @SneakyThrows
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) {
         log.info("invoked method: [{}]", method.getName());
@@ -63,6 +67,12 @@ public class RpcClientProxy implements InvocationHandler {
             .paramTypes(method.getParameterTypes())
             .build();
         RpcResponse<Object> rpcResponse = null;
+        if(rpcRequestTransport instanceof NettyRpcClient) {
+            // 使用 CompletableFuture 进行优化，异步处理
+            CompletableFuture<RpcResponse<Object>> completableFuture = (CompletableFuture<RpcResponse<Object>>) rpcRequestTransport.sendRpcRequest(rpcRequest);
+            // 同步阻塞接受结果
+            rpcResponse = completableFuture.get();
+        }
         if (rpcRequestTransport instanceof SocketRpcClient) {
             rpcResponse = (RpcResponse<Object>) rpcRequestTransport.sendRpcRequest(rpcRequest);
             log.info("rpcResponse={}", rpcResponse);

@@ -1,6 +1,13 @@
 package com.zhl.remoting.transport.netty.client;
 
+import com.zhl.enums.RpcErrorMessageEnum;
+import com.zhl.enums.ServiceRegistryEnum;
+import com.zhl.exception.RpcException;
+import com.zhl.extensions.ExtensionLoader;
+import com.zhl.factory.SingletonFactory;
+import com.zhl.registry.ServiceDiscovery;
 import com.zhl.remoting.dto.RpcRequest;
+import com.zhl.remoting.dto.RpcResponse;
 import com.zhl.remoting.transport.RpcRequestTransport;
 import com.zhl.serialize.kryo.KryoSerializer;
 import io.netty.bootstrap.Bootstrap;
@@ -13,6 +20,7 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
@@ -27,8 +35,11 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class NettyRpcClient implements RpcRequestTransport {
 
-    private Bootstrap bootstrap;
-    private NioEventLoopGroup nioEventLoopGroup;
+    private final ServiceDiscovery serviceDiscovery;
+    private final Bootstrap bootstrap;
+    private final NioEventLoopGroup nioEventLoopGroup;
+    private final UnprocessedRequests unprocessedRequests;
+    private final ChannelProvider channelProvider;
 
 
     public NettyRpcClient() {
@@ -49,7 +60,35 @@ public class NettyRpcClient implements RpcRequestTransport {
 
                 }
             });
+        this.serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension(ServiceRegistryEnum.ZK.getName());
+        this.unprocessedRequests = SingletonFactory.getInstance(UnprocessedRequests.class);
+        this.channelProvider = SingletonFactory.getInstance(ChannelProvider.class);
+    }
 
+
+
+    @Override
+    public Object sendRpcRequest(RpcRequest rpcRequest) {
+        CompletableFuture<RpcResponse<Object>> resultFuture = new CompletableFuture<>();
+        InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(rpcRequest);
+        Channel chanel = getChanel(inetSocketAddress);
+        if (chanel.isActive()) {
+            unprocessedRequests.put(rpcRequest.getRequestId(), resultFuture);
+            // 封装自定义Rpc消息，包括协议等
+            chanel.writeAndFlush(rpcRequest).addListener((ChannelFutureListener)future -> {
+                if (future.isSuccess()) {
+                    log.info("");
+                }else {
+                    future.channel().close();
+                    resultFuture.completeExceptionally(future.cause());
+                    log.info("");
+                }
+            });
+        }else {
+            throw new RpcException(RpcErrorMessageEnum.CLIENT_CONNECT_SERVER_FAILURE);
+        }
+
+        return resultFuture;
     }
 
     @SneakyThrows
@@ -70,10 +109,18 @@ public class NettyRpcClient implements RpcRequestTransport {
         return completableFuture.get();
     }
 
-
-    @Override
-    public Object sendRpcRequest(RpcRequest rpcRequest) {
-        return null;
+    /**
+     * 获取和服务建立连接后的 Channel
+     * @param inetSocketAddress 建立连接的服务
+     * @return
+     */
+    public Channel getChanel(InetSocketAddress inetSocketAddress) {
+        Channel channel = channelProvider.get(inetSocketAddress);
+        if(channel==null) {
+            channel = doConnect(inetSocketAddress);
+            channelProvider.set(inetSocketAddress, channel);
+        }
+        return channel;
     }
 
     public void close() {
