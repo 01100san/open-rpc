@@ -1,5 +1,7 @@
 package com.zhl.registry;
 
+import com.zhl.extensions.SPI;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
@@ -9,6 +11,7 @@ import java.net.InetSocketAddress;
  * @author zhl
  * @since 2024-07-14 9:25
  */
+@SPI
 public interface ServiceRegistry {
     /**
      * 服务注册

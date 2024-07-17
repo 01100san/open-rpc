@@ -5,7 +5,7 @@ import com.zhl.remoting.dto.RpcResponse;
 import com.zhl.remoting.transport.netty.handlers.NettyKryoDecoder;
 import com.zhl.remoting.transport.netty.handlers.NettyKryoEncoder;
 import com.zhl.remoting.transport.netty.handlers.NettyServerHandler;
-import com.zhl.serialize.KryoSerializer;
+import com.zhl.serialize.kryo.KryoSerializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

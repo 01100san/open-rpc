@@ -1,7 +1,9 @@
 package com.zhl.remoting.transport.socket;
 
 import com.zhl.enums.RpcErrorMessageEnum;
+import com.zhl.enums.ServiceRegistryEnum;
 import com.zhl.exception.RpcException;
+import com.zhl.extensions.ExtensionLoader;
 import com.zhl.factory.SingletonFactory;
 import com.zhl.registry.ServiceDiscovery;
 import com.zhl.registry.zk.ZkServiceDiscoveryImpl;
@@ -16,6 +18,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.cert.Extension;
 
 /**
  * <p>
@@ -29,8 +32,7 @@ public class SocketRpcClient implements RpcRequestTransport {
     private final ServiceDiscovery serviceDiscovery;
 
     public SocketRpcClient() {
-        // TODO SPI
-        this.serviceDiscovery = new ZkServiceDiscoveryImpl();
+        this.serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension(ServiceRegistryEnum.ZK.getName());
     }
 
 

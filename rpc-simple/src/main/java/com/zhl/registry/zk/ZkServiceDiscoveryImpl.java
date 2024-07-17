@@ -1,7 +1,9 @@
 package com.zhl.registry.zk;
 
+import com.zhl.enums.LoadBalanceEnum;
 import com.zhl.enums.RpcErrorMessageEnum;
 import com.zhl.exception.RpcException;
+import com.zhl.extensions.ExtensionLoader;
 import com.zhl.loadbalance.ConsistentHashLoadBalance;
 import com.zhl.loadbalance.LoadBalance;
 import com.zhl.registry.ServiceDiscovery;
@@ -27,7 +29,7 @@ public class ZkServiceDiscoveryImpl implements ServiceDiscovery {
     private final LoadBalance loadBalance;
 
     public ZkServiceDiscoveryImpl() {
-        loadBalance=new ConsistentHashLoadBalance();
+        loadBalance= ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(LoadBalanceEnum.LOAD_BALANCE.getName());
     }
 
     @Override

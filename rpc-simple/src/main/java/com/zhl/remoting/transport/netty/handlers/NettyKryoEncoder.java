@@ -1,6 +1,6 @@
 package com.zhl.remoting.transport.netty.handlers;
 
-import com.zhl.serialize.KryoSerializer;
+import com.zhl.serialize.kryo.KryoSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;

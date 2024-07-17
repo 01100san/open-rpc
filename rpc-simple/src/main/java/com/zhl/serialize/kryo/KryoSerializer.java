@@ -1,4 +1,4 @@
-package com.zhl.serialize;
+package com.zhl.serialize.kryo;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -6,6 +6,7 @@ import com.esotericsoftware.kryo.io.Output;
 import com.zhl.exception.SerializeException;
 import com.zhl.remoting.dto.RpcRequest;
 import com.zhl.remoting.dto.RpcResponse;
+import com.zhl.serialize.Serializer;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
@@ -18,7 +19,7 @@ import java.io.ByteArrayOutputStream;
  * @since 2024-07-12 9:56
  */
 @Slf4j
-public class KryoSerializer implements Serializer{
+public class KryoSerializer implements Serializer {
 
     /**
      * Kryo 的序列化不是线程安全的，每个线程都应该有自己的 Kryo，Input 和 Output 示例，将Kryo 存储在线程中
@@ -53,6 +54,7 @@ public class KryoSerializer implements Serializer{
         try(ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             Input input = new Input(bais)) {
             Kryo kryo = kryoThreadLocal.get();
+            // byte->Object:从byte数组中反序列化出对对象
             T obj = kryo.readObject(input, clazz);
             kryoThreadLocal.remove();
             return obj;

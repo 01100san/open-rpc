@@ -3,7 +3,9 @@ package com.zhl.provider.zk;
 import com.esotericsoftware.minlog.Log;
 import com.zhl.config.RpcServiceConfig;
 import com.zhl.enums.RpcErrorMessageEnum;
+import com.zhl.enums.ServiceRegistryEnum;
 import com.zhl.exception.RpcException;
+import com.zhl.extensions.ExtensionLoader;
 import com.zhl.provider.ServiceProvider;
 import com.zhl.registry.ServiceDiscovery;
 import com.zhl.registry.ServiceRegistry;
@@ -48,8 +50,7 @@ public class ZkServiceProviderImpl implements ServiceProvider {
     public ZkServiceProviderImpl() {
         registeredService = ConcurrentHashMap.newKeySet();
         serviceMap = new ConcurrentHashMap<>();
-        // TODO 替换为SPI机制读取
-        serviceRegistry = new ZkServiceRegistryImpl();
+        serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension(ServiceRegistryEnum.ZK.getName());
     }
 
     @Override

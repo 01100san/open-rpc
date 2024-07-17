@@ -1,0 +1,1 @@
+kryo=com.zhl.serialize.kryo.KryoSerializer

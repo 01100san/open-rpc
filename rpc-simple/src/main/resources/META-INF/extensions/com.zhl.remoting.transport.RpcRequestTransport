@@ -1,0 +1,2 @@
+netty=com.zhl.remoting.transport.netty.client.NettyRpcClient
+socket=com.zhl.remoting.transport.socket.SocketRpcClient

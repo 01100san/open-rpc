@@ -1,5 +1,7 @@
 package com.zhl.serialize;
 
+import com.zhl.extensions.SPI;
+
 /**
  * <p>
  *  序列化接口，所有序列化类都要实现这个接口
@@ -7,6 +9,7 @@ package com.zhl.serialize;
  * @author zhl
  * @since 2024-07-12 10:03
  */
+@SPI
 public interface Serializer {
     /**
      * 序列化
