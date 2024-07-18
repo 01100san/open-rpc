@@ -69,7 +69,7 @@ public class ThreadPoolFactoryUtil {
             threadFactory);
     }
 
-    private static ThreadFactory createThreadFactory(String threadPoolPrefix, Boolean daemon) {
+    public static ThreadFactory createThreadFactory(String threadPoolPrefix, Boolean daemon) {
         if(threadPoolPrefix!=null) {
             if(daemon!=null) {
                 return new ThreadFactoryBuilder()

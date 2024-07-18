@@ -63,16 +63,16 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
         Object decode = super.decode(ctx, in);
         if(decode instanceof ByteBuf) {
             ByteBuf frame = (ByteBuf) decode;
-            try {
                 if(frame.readableBytes() >= RpcConstants.TOTAL_LENGTH) {
-                    return decodeFrame(frame);
+                    try {
+                        return decodeFrame(frame);
+                    } catch (Exception e) {
+                        log.error("Decoder error !");
+                        throw e;
+                    } finally {
+                        frame.release();
+                    }
                 }
-            } catch (Exception e) {
-                log.error("Decoder error !");
-                throw e;
-            } finally {
-                frame.release();
-            }
         }
         return decode;
     }
@@ -97,10 +97,12 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
         // 消息类型是心跳的请求数据
         if(messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
             rpcMessage.setData(RpcConstants.PING);
+            return rpcMessage;
         }
         // 消息类型是心跳的响应数据
         if (messageType==RpcConstants.HEARTBEAT_RESPONSE_TYPE) {
             rpcMessage.setData(RpcConstants.PONG);
+            return rpcMessage;
         }
         // 读取正文消息
         int bodyLength = fullLength - RpcConstants.HEAD_LENGTH;

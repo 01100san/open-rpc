@@ -50,9 +50,9 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
             out.writerIndex(out.writerIndex()+4);
             byte messageType = msg.getMessageType();
             out.writeByte(messageType);
-            out.writeByte(CompressEnum.GZIP.getCode());
             out.writeByte(msg.getCodec());
-            out.writeByte(ATOMIC_INTEGER.getAndIncrement());
+            out.writeByte(CompressEnum.GZIP.getCode());
+            out.writeInt(ATOMIC_INTEGER.getAndIncrement());
 
             byte[] bodyBytes = null;
             // 如果消息类型不是心跳类型，则消息总长度=消息头长度（16）+消息体长度（bodyBytes.length）
@@ -60,12 +60,15 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
             if (messageType!=RpcConstants.HEARTBEAT_REQUEST_TYPE &&
                 messageType!=RpcConstants.HEARTBEAT_RESPONSE_TYPE ) {
                 // 开始序列化
-                Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).
-                    getExtension(SerializationTypeEnum.getName(msg.getCodec()));
+                String codecName = SerializationTypeEnum.getName(msg.getCodec());
+                Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class)
+                    .getExtension(codecName);
+                log.info("codec name: [{}] ", codecName);
                 bodyBytes = serializer.serialize(msg.getData());
                 // 开始压缩
+                String compressName = CompressEnum.getName(msg.getCompress());
                 Compress compress = ExtensionLoader.getExtensionLoader(Compress.class).
-                    getExtension(CompressEnum.getName(msg.getCompress()));
+                    getExtension(compressName);
                 bodyBytes = compress.compress(bodyBytes);
                 // 更新总长度
                 fullLength += bodyBytes.length;

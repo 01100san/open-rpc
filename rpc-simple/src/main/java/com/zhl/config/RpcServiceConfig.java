@@ -25,6 +25,9 @@ public class RpcServiceConfig {
      */
     private Object service;
 
+    /**
+     * serviceName(目标服务的全限定接口名) + group + version
+     */
     public String getRpcServiceName() {
         return  this.getServiceName() + this.getGroup() + this.getVersion();
     }
