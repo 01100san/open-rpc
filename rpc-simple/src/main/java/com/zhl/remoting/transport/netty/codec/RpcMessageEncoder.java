@@ -79,15 +79,15 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
             }
             // 获取当前的写指针
             int writerIndex = out.writerIndex();
-            log.debug("currentWriteIndex={}", writerIndex);
+//            log.info("currentWriteIndex={}", writerIndex);
             // 重新回到跳过前的位置
             out.writerIndex(writerIndex - fullLength + RpcConstants.MAGIC_NUMBER.length + 1);
-            log.debug("lastWriterIndex={}", writerIndex - fullLength + RpcConstants.MAGIC_NUMBER.length + 1);
+//            log.info("lastWriterIndex={}", writerIndex - fullLength + RpcConstants.MAGIC_NUMBER.length + 1);
             // 写入总消息长度
             out.writeInt(fullLength);
             // 重新回到当前的写指针位置
             out.writerIndex(writerIndex);
-            log.debug("currentWriteIndex={}", writerIndex);
+//            log.info("currentWriteIndex={}", writerIndex);
         } catch (Exception e) {
             log.error("Encode request error!", e);
         }
