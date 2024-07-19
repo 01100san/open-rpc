@@ -1,1 +1,2 @@
 kryo=com.zhl.serialize.kryo.KryoSerializer
+hessian2=com.zhl.serialize.hessian.Hessian2Serializer
