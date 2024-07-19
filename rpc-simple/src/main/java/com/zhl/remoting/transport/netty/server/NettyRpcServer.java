@@ -25,17 +25,19 @@ import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 /**
  * <p>
  * 基于 Netty 的RpcServer
- *
+ *  将 NettyRpcServer 交给 Spring 管理
  * @author zhl
  * @since 2024-07-16 16:43
  */
 @Slf4j
+@Component
 public class NettyRpcServer {
     private final ServiceProvider serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);
     /**
