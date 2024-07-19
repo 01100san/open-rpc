@@ -12,7 +12,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum SerializationTypeEnum {
-    KRYO((byte) 0x01, "kryo");
+    KRYO((byte) 0x01, "kryo"),
+    HESSIAN((byte) 0X03, "hessian2");
 
     private final byte code;
     private final String name;
