@@ -2,6 +2,7 @@ package com.zhl.service;
 
 import com.zhl.Hello;
 import com.zhl.HelloService;
+import com.zhl.annotation.RpcService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2024-07-16 9:24
  */
 @Slf4j
+@RpcService(version = "version1", group = "test1")
 public class HelloServiceImpl implements HelloService {
     static {
         System.out.println("HelloServiceImpl被创建");
